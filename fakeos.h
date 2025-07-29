@@ -4,7 +4,7 @@
 #define ERROR (0)
 #define TIMEOUT (0xEFFFFFFF)
 
-// TODO: in real life this is the actual memory page ID not a char*
+// TODO: should this be the actual memory page ID not a char* in real OS?
 typedef char* Page; // one page of memory
 typedef int LinkID; // 32 bit socket ID
 typedef long long int Ticks; // clock tick count
@@ -13,25 +13,37 @@ Ticks ticks();  // current uptime in ticks
 Ticks second(); // ticks per second so you can sleep(3*second())
 void  sleep(Ticks ticks);
 
-// TODO:
-// creating a linked list of pages and passing them to syscalls does not work !!!
-// it has to be a contiguous chunk of memory
-// this might require passing a count of pages to allocate to page() or using order() syscall
+// TODO: should the syscall accept a Page with a null terminated URL of the program directly?
+bool run(Page firstPage, unsigned long long size); // start a process from the image loaded in memory
+void done(int errlevel); // terminate current process.  This function does not return.
 
-Page page();     // Allocates a new page.  0 indicates an error
-void drop(Page p); // Deletes a page
-// insert() Orders pages in physical memory one after another to form contiguous chunk
+
+/////////////////////////////////// MEMORY MANAGEMENT /////////////////////////////////////////////
+// Creating a linked list of pages and passing them to syscalls does not work.
+// It has to be a contiguous chunk of memory.
+
+// TODO: pass a count of pages to allocate in a contiguous memory space??  page(int pageCount)
+Page page(int pageCount);     // Allocates a new page.  0 indicates an error
+void drop(Page p); // Deletes a page // TODO: supply contiguous page count?
+char* address(Page p); // return the memory address of this page.  Implement as a macro???
+
+// Orders pages in physical memory one after another to form contiguous chunk
 // ordering pages like that allows resizing vectors without realloc()
 // it can allow building buffers page by page as data is being read
 // false can be returned if inserting pages will override another page's physical address ???
-// page() can take parameters to keep buffers, heap and stack separately.
-// in theorystack frame could start on new page every time.
-bool insert(Page p1, Page p2); 
-char* address(Page p); // return address of this page
+// page() can take parameters to keep buffers, heap and stack separately ???
+// in theory stack frame could start on new page every time.
+// This function could allow deleting pages from the middle of a contiguous memory space.
+// The question is then, should this be insert() to insert pages at random locations for symmetry?
+// It will invalidate addresses of all memory pages after the insert()
+Page append(Page p, Page p2); // returns p2 or ERROR
 
-bool run(Page firstPage, unsigned long long size); // start a process from the image loaded in memory
-void done(int errlevel); // terminate the process.  This function does not return.
+// Create and appends N pages right after p.
+// Similar to append() where you call page() or read() to get p2 and then append() to insert p2 after p1
+Page add(Page p, int pageCount); // returns last page added or ERROR
 
+
+////////////////////////////////////////// NETWORK ////////////////////////////////////////////////
 // Create a client or a server.  LinkID 0 indicates an error
 // url is a page containing a null terminated string (c string) starting at offset 0
 // url format is protocol://ip_or_name:port/cmd_line_parameters
