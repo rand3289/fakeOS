@@ -20,3 +20,6 @@ PROBLEMS:
 
 * when creating a link, it's impossible to wait for a client or a server connection using select()
 
+# fakeOS AI version (v2)
+fakeOS_ai directory contains a version of an AI generated syscalls.h and implementation of a shell based on syscalls.h
+Instead of a page based manually created fakeOS, AI generated version uses pointer based syscalls.
