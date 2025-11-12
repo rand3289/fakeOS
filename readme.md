@@ -10,14 +10,11 @@ Instead of threads and IPC, an optimized network stack provides a local exchange
 
 The main idea is to replace syscalls with fast datagram (one memory page) "reads/writes" to local services.  These service can also be transparently substituted for remote services.  For example a program can create a process by connecting (or sending a datagram) to fakeOS and requesting to run another program ( by supplying a URL).
 
-TODO:
+## TODO
 
 * pass URL and other parameters (PID, API key) to the process upon startup (via argv[]???)
 * Should we change "char* url" parameter of link() to Page?
 * What facilities should we add for crash handling?  Upload core/stack/parameter values/IP to URL of the program?
-
-PROBLEMS:
-
 * when creating a link, it's impossible to wait for a client or a server connection using select()
 
 # fakeOS AI version (v2)
