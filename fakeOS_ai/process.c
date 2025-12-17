@@ -16,6 +16,7 @@ struct proc_info* get_proc_info(int pid) {
     if (proc_count < 1024) {
         processes[proc_count].pid = pid;
         processes[proc_count].error_code = 0;
+        processes[proc_count].memSize = 0;
         return &processes[proc_count++];
     }
     return NULL;

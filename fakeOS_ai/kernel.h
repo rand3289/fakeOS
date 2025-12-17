@@ -5,6 +5,7 @@
 struct proc_info {
     int pid;
     int error_code;
+    size_t memSize;
 };
 struct proc_info* get_proc_info(int pid); // get information about a process
 
