@@ -8,6 +8,38 @@
 static int spawned_pids[1024];
 static int spawned_count = 0;
 
+struct proc_errno {
+    int pid;
+    int error_code;
+};
+
+static struct proc_errno proc_errors[1024];
+static int error_count = 0;
+
+void error(int err) {
+    int pid = getpid();
+    for (int i = 0; i < error_count; i++) {
+        if (proc_errors[i].pid == pid) {
+            proc_errors[i].error_code = err;
+            return;
+        }
+    }
+    if (error_count < 1024) {
+        proc_errors[error_count].pid = pid;
+        proc_errors[error_count++].error_code = err;
+    }
+}
+
+int errno(void) {
+    int pid = getpid();
+    for (int i = 0; i < error_count; i++) {
+        if (proc_errors[i].pid == pid) {
+            return proc_errors[i].error_code;
+        }
+    }
+    return 0;
+}
+
 static void deletePid(int pid){
     for (int i = 0; i < spawned_count; i++) {
         if (spawned_pids[i] == pid) {
