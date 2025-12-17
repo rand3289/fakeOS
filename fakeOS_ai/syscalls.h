@@ -12,10 +12,7 @@ int wait(int pid);                                        // Wait for child proc
 int getpid(void);                                         // Get current process ID
 int kill(int pid, int signal);                            // Terminate another process
 int ps(int* pids, int max_count);                         // List running processes
-
-// System Information
-int errno(void);                                          // Get last error code
-int netinfo(struct netconn* conns, int max_count);        // List all active network connections
+int errno(void);                                          // Get process' last error code
 
 // Time Management
 void sleep(int ms);                                       // Sleep for specified milliseconds
@@ -35,6 +32,7 @@ int accept(int handle);                                   // Accept incoming con
 int select(int* handles, int count, int timeout);         // Wait for events on multiple handles
 int getpeername(int handle, char* addr, size_t addr_len); // Get remote endpoint info
 int close(int handle);                                    // Close connection
+int netinfo(struct netconn* conns, int max_count);        // List all active network connections
 
 // System Control
 void shutdown(void);                                      // Graceful system shutdown

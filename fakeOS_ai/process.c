@@ -8,14 +8,18 @@
 static int spawned_pids[1024];
 static int spawned_count = 0;
 
-void exit(int status) {
-    int my_pid = getpid();
+static void deletePid(int pid){
     for (int i = 0; i < spawned_count; i++) {
-        if (spawned_pids[i] == my_pid) {
+        if (spawned_pids[i] == pid) {
             spawned_pids[i] = spawned_pids[--spawned_count];
             break;
         }
     }
+}
+
+void exit(int status) {
+    int my_pid = getpid();
+    deletePid(my_pid);
     _exit(status);
 }
 
@@ -47,12 +51,7 @@ int getpid(void) {
 
 int kill(int pid, int signal) {
     if (kill(pid, signal) == 0) {
-        for (int i = 0; i < spawned_count; i++) {
-            if (spawned_pids[i] == pid) {
-                spawned_pids[i] = spawned_pids[--spawned_count];
-                break;
-            }
-        }
+        deletePid(pid);
         return 0;
     }
     error(errno);
