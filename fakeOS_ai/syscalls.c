@@ -7,13 +7,12 @@
 #include <string.h>
 
 void shutdown(void) {
-    sync();
-    system("shutdown -h now");
+// TODO: log to system console
+    exit(0); // exit this "kernel" process
 }
 
 void reboot(void) {
-    sync();
-    system("reboot");
+// TODO: kill all running processes, and start shell
 }
 
 void sleep(int ms) {

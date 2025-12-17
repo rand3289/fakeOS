@@ -5,15 +5,11 @@
 #include <signal.h>
 #include <errno.h>
 
-struct proc_info {
-    int pid;
-    int error_code;
-};
 
 static struct proc_info processes[1024];
 static int proc_count = 0;
 
-static struct proc_info* get_proc_info(int pid) {
+struct proc_info* get_proc_info(int pid) {
     for (int i = 0; i < proc_count; i++) {
         if (processes[i].pid == pid) return &processes[i];
     }
@@ -26,12 +22,12 @@ static struct proc_info* get_proc_info(int pid) {
 }
 
 void error(int err) {
-    struct proc_info* pi = get_proc_info(getpid());
+    struct proc_info* pi = get_proc_info(pid());
     if (pi) pi->error_code = err;
 }
 
 int errno(void) {
-    struct proc_info* pi = get_proc_info(getpid());
+    struct proc_info* pi = get_proc_info(pid());
     return pi ? pi->error_code : 0;
 }
 
@@ -45,7 +41,7 @@ static void deletePid(int pid){
 }
 
 void exit(int status) {
-    int my_pid = getpid();
+    int my_pid = pid();
     deletePid(my_pid);
     _exit(status);
 }
@@ -72,7 +68,7 @@ int wait(int pid) {
     return -1;
 }
 
-int getpid(void) {
+int pid(void) {
     return getpid();
 }
 

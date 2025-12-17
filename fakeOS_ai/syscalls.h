@@ -10,8 +10,8 @@ struct memstat { size_t total; size_t used; };
 void exit(int status);                                    // Terminate current process
 int spawn(void* addr);                                    // Create new process with code at address
 int wait(int pid);                                        // Wait for child process to terminate
-int getpid(void);                                         // Get current process ID
-int pkill(int pid, int signal);                            // Terminate another process
+int pid(void);                                            // Get current process ID
+int pkill(int pid, int signal);                           // Terminate another process
 int ps(int* pids, int max_count);                         // List running processes
 int errno(void);                                          // Get process' last error code
 
