@@ -6,7 +6,7 @@
 #include <stdio.h>
 
 void* mmap_(os_size size, int flags) {
-    void* addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+    void* addr = mmap(NULL, size, flags | PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (addr != MAP_FAILED) {
         struct proc_info* pi = get_proc_info(pid());
         if (pi) pi->memSize += size;

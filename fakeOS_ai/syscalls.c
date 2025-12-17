@@ -1,4 +1,5 @@
 #include "syscalls.h"
+#define _GNU_SOURCE // make usleep() available
 #include <unistd.h>
 #include <time.h>
 
@@ -12,7 +13,7 @@ void reboot(void) {
 }
 
 void sleep_(int ms) {
-// TODO:    usleep(ms * 1000);
+    usleep(ms * 1000);
 }
 
 long gettime(void) {

@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 int netinfo(struct netconn* conns, int max_count) {
-    // Simplified - would need to parse /proc/net/tcp
+    // TODO:
     return 0;
 }
 

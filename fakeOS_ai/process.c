@@ -1,9 +1,10 @@
 #include "syscalls.h"
 #include "kernel.h"
-#include <unistd.h>
-#include <sys/wait.h>
+#define _GNU_SOURCE // make kill() available
 #include <signal.h> // kill()
 #include <errno.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 
 static struct proc_info processes[1024];
@@ -74,10 +75,10 @@ int pid(void) {
 }
 
 int pkill(int pid, int signal) {
-//TODO:    if (kill(pid, signal) == 0) {
+if (kill(pid, signal) == 0) {
         deletePid(pid);
         return 0;
-//    }
+    }
     error(errno);
     return -1;
 }
@@ -85,9 +86,9 @@ int pkill(int pid, int signal) {
 int ps(int* pids, int max_count) {
     int count = 0;
     for (int i = 0; i < proc_count && count < max_count; i++) {
-//TODO:        if (kill(processes[i].pid, 0) == 0) {
+        if (kill(processes[i].pid, 0) == 0) {
             pids[count++] = processes[i].pid;
-//        }
+        }
     }
     return count;
 }

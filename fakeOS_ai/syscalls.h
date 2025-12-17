@@ -2,7 +2,7 @@
 #define INCLUDED_SYSCALLS_H
 // these are syscalls and data structures available in fakeOS to user processes
 
-typedef unsigned long long os_size;
+typedef long long os_size; // signed size so that -1 etc can be returned
 struct netconn { int pid; char addr[64]; };
 
 // Process Management
@@ -12,6 +12,7 @@ int pwait(int pid);                                        // Wait for child pro
 int pid(void);                                             // Get current process ID
 int pkill(int pid, int signal);                            // Terminate another process
 int ps(int* pids, int max_count);                          // List running processes
+//TODO: rethink this whole business with 'errno'
 int errnum(void);                                          // Get process' last error code
 
 // Memory Management
