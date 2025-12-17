@@ -9,6 +9,15 @@
 static struct proc_info processes[1024];
 static int proc_count = 0;
 
+static void deletePid(int pid){
+    for (int i = 0; i < proc_count; i++) {
+        if (processes[i].pid == pid) {
+            processes[i] = processes[--proc_count];
+            break;
+        }
+    }
+}
+
 struct proc_info* get_proc_info(int pid) {
     for (int i = 0; i < proc_count; i++) {
         if (processes[i].pid == pid) return &processes[i];
@@ -30,15 +39,6 @@ void error(int err) {
 int errno(void) {
     struct proc_info* pi = get_proc_info(pid());
     return pi ? pi->error_code : 0;
-}
-
-static void deletePid(int pid){
-    for (int i = 0; i < proc_count; i++) {
-        if (processes[i].pid == pid) {
-            processes[i] = processes[--proc_count];
-            break;
-        }
-    }
 }
 
 void exit(int status) {

@@ -9,6 +9,6 @@ struct proc_info {
 };
 struct proc_info* get_proc_info(int pid); // get information about a process
 
-void error(int err); // Set process' error code retrievable by errno() syscall
+void error(int err); // Set process' error_code retrievable by errno() syscall
 
 #endif

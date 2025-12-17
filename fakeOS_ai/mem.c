@@ -26,12 +26,10 @@ int munmap(void* addr, size_t size) {
     return -1;
 }
 
-int meminfo(struct memstat* info) {
-    struct proc_info* pi = get_proc_info(pid());
+size_t meminfo(int pid) {
+    struct proc_info* pi = get_proc_info(pid);
     if (pi) {
-        info->used = pi->memSize;
-        info->total = pi->memSize + 1024*1024; // Assume 1MB available
-        return 0;
+        return pi->memSize;
     }
     error(ESRCH);
     return -1;
