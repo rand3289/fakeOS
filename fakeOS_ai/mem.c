@@ -5,7 +5,7 @@
 #include <errno.h>
 #include <stdio.h>
 
-void* mmap(size_t size, int flags) {
+void* mmap_(os_size size, int flags) {
     void* addr = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
     if (addr != MAP_FAILED) {
         struct proc_info* pi = get_proc_info(pid());
@@ -16,7 +16,7 @@ void* mmap(size_t size, int flags) {
     return NULL;
 }
 
-int munmap(void* addr, size_t size) {
+int munmap_(void* addr, os_size size) {
     if (munmap(addr, size) == 0) {
         struct proc_info* pi = get_proc_info(pid());
         if (pi) pi->memSize -= size;
@@ -26,7 +26,7 @@ int munmap(void* addr, size_t size) {
     return -1;
 }
 
-size_t meminfo(int pid) {
+os_size meminfo(int pid) {
     struct proc_info* pi = get_proc_info(pid);
     if (pi) {
         return pi->memSize;

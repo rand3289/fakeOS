@@ -2,7 +2,7 @@
 #include "kernel.h"
 #include <unistd.h>
 #include <sys/wait.h>
-#include <signal.h>
+#include <signal.h> // kill()
 #include <errno.h>
 
 
@@ -36,7 +36,7 @@ void error(int err) {
     if (pi) pi->error_code = err;
 }
 
-int errno(void) {
+int errnum(void) {
     struct proc_info* pi = get_proc_info(pid());
     return pi ? pi->error_code : 0;
 }
@@ -54,14 +54,14 @@ int spawn(void* addr) {
         _exit(0);
     }
     if (pid > 0) {
-        struct proc_info* pi = get_proc_info(pid);
+        get_proc_info(pid); // creates proc_info structure and sets pid
         return pid;
     }
     error(errno);
     return -1;
 }
 
-int wait(int pid) {
+int pwait(int pid) {
     int status;
     int result = waitpid(pid, &status, 0);
     if (result > 0) return WEXITSTATUS(status);
@@ -74,10 +74,10 @@ int pid(void) {
 }
 
 int pkill(int pid, int signal) {
-    if (kill(pid, signal) == 0) {
+//TODO:    if (kill(pid, signal) == 0) {
         deletePid(pid);
         return 0;
-    }
+//    }
     error(errno);
     return -1;
 }
@@ -85,9 +85,9 @@ int pkill(int pid, int signal) {
 int ps(int* pids, int max_count) {
     int count = 0;
     for (int i = 0; i < proc_count && count < max_count; i++) {
-        if (kill(processes[i].pid, 0) == 0) {
+//TODO:        if (kill(processes[i].pid, 0) == 0) {
             pids[count++] = processes[i].pid;
-        }
+//        }
     }
     return count;
 }

@@ -1,18 +1,17 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -std=c99
 TARGET = shell
-OBJS = shell.o str.o
 
-$(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $(TARGET)
+ALL: shell.o str.o libkernel.a
+	$(CC) ${CFLAGS} shell.o str.o -o shell -L. -lkernel
 
-shell.o: shell.c syscalls.h str.h
-	$(CC) $(CFLAGS) -c shell.c
+libkernel.a: kernel.h syscalls.h syscalls.o process.o mem.o network.o
+	ar rcs libkernel.a syscalls.o process.o mem.o network.o
 
-str.o: str.c str.h
-	$(CC) $(CFLAGS) -c str.c
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f $(OBJS) $(TARGET)
+	/bin/rm -f shell libkernel.a *.o
 
 # .PHONY: clean
