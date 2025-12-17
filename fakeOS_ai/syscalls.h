@@ -1,5 +1,6 @@
 #ifndef INCLUDED_SYSCALLS_H
 #define INCLUDED_SYSCALLS_H
+// these are syscalls and data structures available in fakeOS to user processes
 
 typedef unsigned long long size_t;
 struct netconn { int pid; char addr[64]; };
@@ -10,7 +11,7 @@ void exit(int status);                                    // Terminate current p
 int spawn(void* addr);                                    // Create new process with code at address
 int wait(int pid);                                        // Wait for child process to terminate
 int getpid(void);                                         // Get current process ID
-int kill(int pid, int signal);                            // Terminate another process
+int pkill(int pid, int signal);                            // Terminate another process
 int ps(int* pids, int max_count);                         // List running processes
 int errno(void);                                          // Get process' last error code
 

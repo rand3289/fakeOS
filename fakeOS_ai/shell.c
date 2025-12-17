@@ -29,7 +29,7 @@ void handle_command(int conn, char* args[], int argc) {
         reboot();
     }
     else if (str_cmp(args[0], "kill") == 0 && argc > 1) {
-        kill(str_to_num(args[1]), 9);
+        pkill(str_to_num(args[1]), 9);
     }
     else if (str_cmp(args[0], "time") == 0) {
         write_num(conn, gettime());
