@@ -1,6 +1,6 @@
 #ifndef INCLUDED_KERNEL_H
 #define INCLUDED_KERNEL_H
-#include "syscalls.h"
+#include "syscalls.h" // os_size
 // these are kernel only functions not available to user level programs
 
 struct proc_info {
