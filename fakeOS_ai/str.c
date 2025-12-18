@@ -50,7 +50,7 @@ int str_parse(char* buf, char* args[]) {
         while (*p == ' ') p++;
         if (!*p) break;
         args[argc++] = p;
-        while (*p && *p != ' ') p++;
+        while (*p && *p != ' ' && *p != '\r' && *p != '\n') p++;
         if (*p) *p++ = 0;
     }
     return argc;

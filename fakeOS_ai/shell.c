@@ -18,8 +18,11 @@ void write_num(int handle, int num) {
 }
 
 void handle_command(int conn, char* args[], int argc) {
-    // missing commands: wait <pid>, uptime, help, history
-    if (str_cmp(args[0], "sleep") == 0 && argc > 1) {
+    // missing commands: wait <pid>, uptime, history, quit(disconnect from shell)
+    if (str_cmp(args[0], "help") == 0) {
+        const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run\n";
+        write_(conn, msg, str_len(msg));
+    } else if (str_cmp(args[0], "sleep") == 0) {
         sleep_(str_to_num(args[1]));
     }
     else if (str_cmp(args[0], "shutdown") == 0) {
@@ -80,14 +83,14 @@ void handle_command(int conn, char* args[], int argc) {
 }
 
 int main() {
-    int server = listen_("tcp://:22");
+    int server = listen_("tcp://:2222");
     int clients[16];
     int client_count = 0;
     
     while (1) {
         clients[client_count] = server;
         int ready = select_(clients, client_count + 1, 1000);
-        if (ready < 0) continue;
+        if (ready <= 0) continue;
 
         if (ready == server) {  // Check for new connections
             int new_client = accept_(server);
@@ -109,7 +112,7 @@ int main() {
 
         char* args[8];
         int argc = str_parse(buf, args);
-        if (argc > 0) {
+        if (argc > 0 && *args[0]) { // at least one token and args[0] does not point to an empty string
             handle_command(ready, args, argc);
         }
         write_(ready, "$ ", 2);
