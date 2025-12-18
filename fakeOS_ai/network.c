@@ -54,7 +54,9 @@ int listen_(const char* url) {
         error(errno);
         return -1;
     }
-    
+    const int enable = 1;
+    setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(int));
+
     struct sockaddr_in addr = {0};
     addr.sin_family = AF_INET;
     addr.sin_port = htons(parts.port);

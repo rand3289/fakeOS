@@ -29,9 +29,9 @@ void handle_command(int conn, char* args[], int argc) {
     if (str_cmp(args[0], "help") == 0) {
         const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run\n";
         write_str(conn, msg);
-    } else if (str_cmp(args[0], "sleep") == 0 && argc == 2) { // sleep 1000
+    } else if (str_cmp(args[0], "sleep") == 0 && argc>1) { // sleep 1000
         sleep_(str_to_num(args[1]));
-    } else if (str_cmp(args[0], "wait") == 0 && argc == 2) { // wait <pid>
+    } else if (str_cmp(args[0], "wait") == 0 && argc>1) { // wait <pid>
         int pid = str_to_num(args[1]);
         pwait(pid);
 
@@ -41,7 +41,7 @@ void handle_command(int conn, char* args[], int argc) {
     else if (str_cmp(args[0], "reboot") == 0) {
         reboot();
     }
-    else if (str_cmp(args[0], "kill") == 0 && argc == 2) { // kill <pid>
+    else if (str_cmp(args[0], "kill") == 0 && argc>1) { // kill <pid>
         pkill(str_to_num(args[1]), 9);
     }
     else if (str_cmp(args[0], "time") == 0) {
@@ -72,14 +72,14 @@ void handle_command(int conn, char* args[], int argc) {
             write_(conn, "\n", 1);
         }
     }
-    else if (str_cmp(args[0], "run") == 0 && argc == 2) { // run http://localhost:8080/myexe
+    else if (str_cmp(args[0], "run") == 0 && argc>1) { // run http://localhost:8080/myexe
         // TODO: move this to its own procedure. Parse response properly.
         int dl = open_(args[1]);
         url_parts_t parts;
-        if (dl >= 0 && parse_url(args[1], &parts) > 0) { // TODO: could leak handles???
+        if (dl >= 0 && parse_url(args[1], &parts) == 0) { // TODO: could leak handles???
             write_str(dl,"HTTP/1.1 GET ");
             write_str(dl, parts.path);
-            write_str(dl, "\r\n");
+            write_str(dl, "\r\n\r\n");
             void* prog = mmap_(65536, 0); // LOL... ai hacked it up by hardcoding the program size
             int size = read_(dl, prog, 65536);
             close_(dl);
