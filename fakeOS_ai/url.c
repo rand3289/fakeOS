@@ -3,6 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+char* strdup(const char* s) {
+    size_t len = strlen(s) + 1;
+    char* dup = malloc(len);
+    if (dup) memcpy(dup, s, len);
+    return dup;
+}
+
 
 int parse_url(const char* url, url_parts_t* parts) {
     if (!url || !parts) return -1;

@@ -7,8 +7,8 @@ ALL: $(TARGET)
 $(TARGET): syscalls.h str.h shell.o str.o libkernel.a
 	$(CC) -o $(TARGET) shell.o str.o -L. -lkernel
 
-libkernel.a: kernel.h syscalls.h syscalls.o process.o mem.o network.o
-	ar rcs libkernel.a syscalls.o process.o mem.o network.o
+libkernel.a: kernel.h syscalls.h syscalls.o url.h url.o process.o mem.o network.o
+	ar rcs libkernel.a syscalls.o process.o mem.o network.o url.o
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
