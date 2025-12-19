@@ -2,6 +2,9 @@
 #include "str.h"
 #include "url.h"
 
+int clients[16];
+int client_count = 0;
+
 int remove_item(int* array, int count, int item) {
     for (int i = 0; i < count; i++) {
         if (array[i] == item) {
@@ -89,59 +92,51 @@ void downloadRun(const char* url, int conn){
 }
 
 void handle_command(int conn, char* args[], int argc) {
-    // TODO: missing commands: uptime, history, quit(disconnect from shell)
+    // TODO: missing commands: uptime, history
     // static long startTime = gettime(); // for uptime
     if (str_cmp(args[0], "help") == 0) {
-        const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run\n";
+        const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run, quit\n";
         write_str(conn, msg);
+    } else if (str_cmp(args[0], "quit") == 0) {
+        close_(conn);
+        client_count = remove_item(clients, client_count, conn);
     } else if (str_cmp(args[0], "sleep") == 0 && argc>1) { // sleep 1000
         sleep_(str_to_num(args[1]));
     } else if (str_cmp(args[0], "wait") == 0 && argc>1) { // wait <pid>
         int pid = str_to_num(args[1]);
         pwait(pid);
-
     } else if (str_cmp(args[0], "shutdown") == 0) {
         shutdown_();
-    }
-    else if (str_cmp(args[0], "reboot") == 0) {
+    } else if (str_cmp(args[0], "reboot") == 0) {
         reboot();
-    }
-    else if (str_cmp(args[0], "kill") == 0 && argc>1) { // kill <pid>
+    } else if (str_cmp(args[0], "kill") == 0 && argc>1) { // kill <pid>
         pkill(str_to_num(args[1]), 9);
-    }
-    else if (str_cmp(args[0], "time") == 0) {
+    } else if (str_cmp(args[0], "time") == 0) {
         write_num(conn, gettime());
         write_(conn, "\n", 1);
-    }
-    else if (str_cmp(args[0], "ps") == 0) {
+    } else if (str_cmp(args[0], "ps") == 0) {
         int pids[32];
         int count = ps(pids, 32);
         for (int i = 0; i < count; i++) {
             write_num(conn, pids[i]);
             write_(conn, "\n", 1);
         }
-    }
-    else if (str_cmp(args[0], "mem") == 0) {
+    } else if (str_cmp(args[0], "mem") == 0) {
         os_size used = meminfo(pid());
         write_str(conn, "Used: ");
         write_num(conn, used);
         write_(conn, "\n", 1);
-    }
-    else if (str_cmp(args[0], "netstat") == 0) {
+    } else if (str_cmp(args[0], "netstat") == 0) {
         netstatus(conn);
-    }
-    else if (str_cmp(args[0], "run") == 0 && argc>1) { // run http://localhost:8080/myexe
+    } else if (str_cmp(args[0], "run") == 0 && argc>1) { // run http://localhost:8080/myexe
         downloadRun(args[1], conn);
-    }
-    else {
+    } else {
         write_str(conn, "Invalid command\n");
     }
 }
 
 int main() {
     int server = listen_("tcp://:2222");
-    int clients[16];
-    int client_count = 0;
     
     while (1) {
         clients[client_count] = server;
