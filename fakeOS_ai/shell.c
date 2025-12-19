@@ -45,15 +45,26 @@ void netstatus(int conn){
 // read HTTP 1.1 response from conn socket and return Content-Length
 os_size parseHttpResponse(int conn){
     char buff[1024];
-    os_size outSize = read_(conn, buff, sizeof(buff));
-    // TODO: parse buff and return Content-Length
-    return 65535;
+    os_size outSize = read_(conn, buff, sizeof(buff)-1);
+    buff[outSize] = 0;
+    
+    char* pos = str_find(buff, "Content-Length: ");
+    if (pos) {
+        pos += 16; // skip "Content-Length: "
+        return str_to_num(pos);
+    }
+    return -1;
 }
 
 // read all data from socket conn into buff up to size
 os_size readAll(int conn, char* buff, os_size size){
-    // TODO: read all data from socket conn into buffer instead of a single read
-    os_size outSize = read_(conn, buff, size);
+    os_size total = 0;
+    while (total < size) {
+        os_size bytes = read_(conn, buff + total, size - total);
+        if (bytes <= 0) break;
+        total += bytes;
+    }
+    return total;
 }
 
 void downloadRun(const char* url, int conn){

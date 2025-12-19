@@ -42,6 +42,17 @@ int str_from_num(char* buf, int num) {
     return i;
 }
 
+char* str_find(const char* str, const char* substr) {
+    while (*str) {
+        const char* s = str;
+        const char* p = substr;
+        while (*s && *p && *s == *p) { s++; p++; }
+        if (!*p) return (char*)str;
+        str++;
+    }
+    return 0;
+}
+
 int str_parse(char* buf, char* args[]) {
     int argc = 0;
     char* p = buf;
