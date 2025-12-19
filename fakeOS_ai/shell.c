@@ -2,6 +2,7 @@
 #include "str.h"
 #include "url.h"
 
+static long startTime; // for uptime
 int clients[16];
 int client_count = 0;
 
@@ -91,15 +92,33 @@ void downloadRun(const char* url, int conn){
     }
 }
 
+void uptime(int conn){
+    long time = gettime();
+    long upt = time - startTime;
+    long s = upt % 60;
+    long m = (upt/60) % 60;
+    long h = (upt/(60*60)) % 24;
+    long d = upt/(60*60*24);
+    write_num(conn, d);
+    write_str(conn, "d ");
+    write_num(conn, h);
+    write_str(conn, "h ");
+    write_num(conn, m);
+    write_str(conn, "m ");
+    write_num(conn, s);
+    write_str(conn, "s\n");
+}
+
 void handle_command(int conn, char* args[], int argc) {
-    // TODO: missing commands: uptime, history
-    // static long startTime = gettime(); // for uptime
+    // TODO: missing commands: history
     if (str_cmp(args[0], "help") == 0) {
-        const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run, quit\n";
+        const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run, quit, uptime\n";
         write_str(conn, msg);
     } else if (str_cmp(args[0], "quit") == 0) {
         close_(conn);
         client_count = remove_item(clients, client_count, conn);
+    } else if (str_cmp(args[0], "uptime") == 0) {
+        uptime(conn);
     } else if (str_cmp(args[0], "sleep") == 0 && argc>1) { // sleep 1000
         sleep_(str_to_num(args[1]));
     } else if (str_cmp(args[0], "wait") == 0 && argc>1) { // wait <pid>
@@ -136,6 +155,7 @@ void handle_command(int conn, char* args[], int argc) {
 }
 
 int main() {
+    startTime = gettime(); // save start time
     int server = listen_("tcp://:2222");
     
     while (1) {
