@@ -23,6 +23,60 @@ void write_str(int handle, const char* str){
     write_(handle, str, len);
 }
 
+void netstatus(int conn){
+    struct netconn conns[16];
+    int count = netinfo(conns, 16);
+    for (int i = 0; i < count; i++) {
+        write_num(conn, conns[i].pid);
+        write_(conn, " ", 1);
+        write_str(conn, conns[i].addr);
+        write_(conn, "\n", 1);
+    }
+}
+
+// Typical http response:
+// HTTP/1.0 200 OK\r\nServer: SimpleHTTP/0.6 Python/3.13.9\r\n
+// Date: Fri, 19 Dec 2025 02:10:12 GMT\r\n
+// Content-type: text/x-python\r\n
+// Content-Length: 279\r\n
+// Last-Modified: Thu, 18 Dec 2025 08:38:17 GMT\r\n
+// \r\n
+
+// read HTTP 1.1 response from conn socket and return Content-Length
+os_size parseHttpResponse(int conn){
+    char buff[1024];
+    os_size outSize = read_(conn, buff, sizeof(buff));
+    // TODO: parse buff and return Content-Length
+    return 65535;
+}
+
+// read all data from socket conn into buff up to size
+os_size readAll(int conn, char* buff, os_size size){
+    // TODO: read all data from socket conn into buffer instead of a single read
+    os_size outSize = read_(conn, buff, size);
+}
+
+void downloadRun(const char* url, int conn){
+    url_parts_t parts;
+    int dl = open_(url);
+    if (dl >= 0 && parse_url(url, &parts) == 0) { // TODO: could leak handles???
+        write_str(dl,"GET ");
+        write_str(dl, parts.path);
+        write_str(dl, " HTTP/1.1\r\n\r\n");
+        os_size size = parseHttpResponse(dl);
+        void* prog = mmap_(size, 0);
+        os_size rdSize = readAll(dl, prog, size);
+        close_(dl);
+        if (size == rdSize) {
+            int pid = spawn(prog); // TODO: pass conn handle to spawn() to allow the new process to communicate with user
+            write_num(conn, pid);
+            write_(conn, "\n", 1);
+            pwait(pid); // TODO: munmap() first ???
+        }
+        munmap_(prog, size);
+    }
+}
+
 void handle_command(int conn, char* args[], int argc) {
     // TODO: missing commands: uptime, history, quit(disconnect from shell)
     // static long startTime = gettime(); // for uptime
@@ -63,34 +117,10 @@ void handle_command(int conn, char* args[], int argc) {
         write_(conn, "\n", 1);
     }
     else if (str_cmp(args[0], "netstat") == 0) {
-        struct netconn conns[16];
-        int count = netinfo(conns, 16);
-        for (int i = 0; i < count; i++) {
-            write_num(conn, conns[i].pid);
-            write_(conn, " ", 1);
-            write_str(conn, conns[i].addr);
-            write_(conn, "\n", 1);
-        }
+        netstatus(conn);
     }
     else if (str_cmp(args[0], "run") == 0 && argc>1) { // run http://localhost:8080/myexe
-        // TODO: move this to its own procedure. Parse response properly.
-        int dl = open_(args[1]);
-        url_parts_t parts;
-        if (dl >= 0 && parse_url(args[1], &parts) == 0) { // TODO: could leak handles???
-            write_str(dl,"HTTP/1.1 GET ");
-            write_str(dl, parts.path);
-            write_str(dl, "\r\n\r\n");
-            void* prog = mmap_(65536, 0); // LOL... ai hacked it up by hardcoding the program size
-            int size = read_(dl, prog, 65536);
-            close_(dl);
-            if (size > 0) {
-                int pid = spawn(prog); // TODO: pass conn handle to spawn() to allow the new process to communicate with user
-                write_num(conn, pid);
-                write_(conn, "\n", 1);
-                pwait(pid); // TODO: munmap() first ???
-            }
-            munmap_(prog, 65536);
-        }
+        downloadRun(args[1], conn);
     }
     else {
         write_str(conn, "Invalid command\n");

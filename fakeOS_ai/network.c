@@ -10,6 +10,8 @@
 #include <unistd.h>
 
 int netinfo(struct netconn* conns, int max_count) {
+    (void) conns;
+    (void) max_count;
     // TODO:
     return 0;
 }
