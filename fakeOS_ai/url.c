@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-char* strdup(const char* s) {
+char* str_dup(const char* s) {
     size_t len = strlen(s) + 1;
     char* dup = malloc(len);
     if (dup) memcpy(dup, s, len);
@@ -18,7 +18,7 @@ int parse_url(const char* url, url_parts_t* parts) {
     memset(parts, 0, sizeof(url_parts_t));
     strcpy(parts->path, "/");
     
-    char* temp = strdup(url);
+    char* temp = str_dup(url);
     char* ptr = temp;
     
     // Extract protocol

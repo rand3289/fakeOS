@@ -109,8 +109,8 @@ void uptime(int conn){
     write_str(conn, "s\n");
 }
 
+// TODO: missing commands: history
 void handle_command(int conn, char* args[], int argc) {
-    // TODO: missing commands: history
     if (str_cmp(args[0], "help") == 0) {
         const char* msg = "help, sleep, shutdown, reboot, kill, time, ps, mem, netstat, run, quit, uptime\n";
         write_str(conn, msg);
@@ -183,7 +183,7 @@ int main() {
 
         char* args[8];
         int argc = str_parse(buf, args);
-        if (argc > 0 && *args[0]) { // at least one token and args[0] does not point to an empty string
+        if (argc > 0 && *args[0]) { // at least one token plus args[0] does not point to an empty string
             handle_command(ready, args, argc);
         }
         write_str(ready, "$ ");
